@@ -1,12 +1,13 @@
 <template>
 <section class="flex">
-  <h1>Register</h1>
+  <h1>Register User</h1>
 
   <section class="flex-grid">
     <section class="col">
       <div class="panel">
+        <h2>New User</h2>
         <form id="app" @submit="checkForm" @submit.prevent="saveUser" method="post">
-          <p v-if="errors.length">
+          <p v-if="errors.length" class="error-message">
             <b>Please correct the following error(s):</b>
             <ul>
               <li v-for="(error) in errors" :key="error.id">{{ error }}</li>
@@ -41,6 +42,7 @@
     </section>
     <section class="col">
       <div class="panel">
+        <h2>Latest Registered Users</h2>
         <table>
           <thead>
             <tr>
