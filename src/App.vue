@@ -1,18 +1,28 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+<section id="app">
+  <nav>
+    <router-link to="/">Home</router-link>
+  </nav>
+  <router-view></router-view>
+</section>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import VueRouter from 'vue-router'
+import Register from './components/Register.vue'
+
+const routes = [
+  { path: '/', component: Register }
+]
+
+const router = new VueRouter({
+  routes // short for `routes: routes`
+})
 
 export default {
   name: 'app',
-  components: {
-    HelloWorld
-  }
+  components: {},
+  router: router
 }
 </script>
 
