@@ -58,11 +58,11 @@
             </tr>
 
             <tr v-if="loading">
-              <td>Loading...</td>
+              <td colspan="3" class="placeholder">Loading...</td>
             </tr>
 
-            <tr v-if="usersEmpty">
-              <td colspan="3">No users registered yet.</td>
+            <tr v-if="!loading && usersEmpty">
+              <td colspan="3" class="placeholder">No users registered yet.</td>
             </tr>
           </tbody>
         </table>
@@ -150,8 +150,18 @@ export default {
     },
     saveUser: function (e) {
       if (!this.valid) return;
+      this.loading = true;
       let newUser = new UserService(this.user)
-      console.log(newUser.save());
+      let component = this;
+      newUser.save().then(
+        function (done) {
+          component.loading = false;
+        },
+        function (error) {
+          component.loading = false;
+          component.errors.push('An error occured while trying to save into the database.');
+        }
+      );
       e.preventDefault();
     },
     usersEmpty: function () {

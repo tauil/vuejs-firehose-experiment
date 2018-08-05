@@ -45,6 +45,10 @@ export default {
 table {
   width: 100%;
 }
+table .placeholder {
+  text-align: center;
+  line-height: 15em;
+}
 form label {
   display: block;
 }
