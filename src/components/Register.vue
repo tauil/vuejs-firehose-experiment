@@ -65,7 +65,7 @@
               <td colspan="3">No users registered yet.</td>
             </tr>
           </tbody>
-      </table>
+        </table>
       </div>
     </section>
   </section>
@@ -73,36 +73,90 @@
 </template>
 
 <script>
-  export default {
-    name: 'register',
-    data: () => {
-      return {
-        loading: false,
-        errors: [],
-        user: {
-          username: '',
-          email: '',
-          password: '',
-          passwordConfirmation: '',
-          createdAt: ''
-        },
-        users: []
+  import UserService from '../services/user-service';
+const user = {
+  username: '',
+  email: '',
+  password: '',
+  passwordConfirmation: '',
+  createdAt: ''
+}
+
+export default {
+  name: 'register',
+  data: () => {
+    return {
+      loading: false,
+      errors: [],
+      valid: false,
+      user: user,
+      users: []
+    }
+  },
+  methods: {
+    checkForm: function (e) {
+      console.log(this.user.username);
+      if ( this.user.username &&
+           this.validUsername(this.user.username) &&
+           this.user.email &&
+           this.validEmail(this.user.email) &&
+           this.user.password &&
+           this.validPassword(this.user.password) &&
+           this.user.passwordConfirmation &&
+           (this.user.password === this.user.passwordConfirmation)) {
+        this.valid = true;
       }
+
+      this.errors = [];
+
+      if (!this.user.username) {
+        this.errors.push('Username required.');
+      } else if (!this.validUsername(this.user.username)) {
+        this.errors.push('Username must have between 6 and 12 characters and can not contain white spaces or non alpha numerical characters.');
+      }
+      if (!this.user.email) {
+        this.errors.push('E-mail required.');
+      } else if (!this.validEmail(this.user.email)) {
+        this.errors.push('Valid email required.');
+      }
+      if (!this.user.password) {
+        this.errors.push('Password required.');
+      } else if (!this.validPassword(this.user.password)) {
+        this.errors.push('Password must have at least 4 characters, including a number and at least one uppercase letter.');
+      }
+      if (!this.user.passwordConfirmation) {
+        this.errors.push('Password confirmation required.');
+      }
+      if (this.user.password !== this.user.passwordConfirmation) {
+        this.errors.push('Password and Confirmation does not match.');
+      }
+
+      e.preventDefault();
     },
-    methods: {
-      checkForm: () => {
-
-      },
-      saveUser: () => {
-
-      },
-      usersEmpty: () => {
-        return this.users.length == 0;
-      }
+    validPassword: function (password) {
+      let regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@$!%*?&]{4,}/
+      return regex.test(password);
+    },
+    validUsername: function (username) {
+      let regex = /\w{6,12}/
+      return regex.test(username);
+    },
+    validEmail: function (email) {
+      let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    },
+    resetModel: function() {
+      this.user = user;
+    },
+    saveUser: function (e) {
+      if (!this.valid) return;
+      let newUser = new UserService(this.user)
+      console.log(newUser.save());
+      e.preventDefault();
+    },
+    usersEmpty: function () {
+      return this.users.length == 0;
     }
   }
+}
 </script>
-
-<style>
-
-</style>
