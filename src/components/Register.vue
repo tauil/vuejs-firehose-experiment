@@ -7,6 +7,8 @@
       <div class="panel">
         <h2>New User</h2>
         <form id="app" @submit="checkForm" @submit.prevent="saveUser" method="post">
+          <p v-if="success" class="success-message">User registered successfully!</p>
+
           <p v-if="errors.length" class="error-message">
             <b>Please correct the following error(s):</b>
             <ul>
@@ -57,6 +59,7 @@
               <td>{{user.username}}</td>
               <td>{{user.email}}</td>
               <td>{{user.createdAt}}</td>
+              <td><input type="button" @click="removeUser(user.id)" value="Remove" /></td>
             </tr>
 
             <tr v-if="loading">
@@ -76,13 +79,6 @@
 
 <script>
   import UserService from '../services/user-service';
-const user = {
-  username: '',
-  email: '',
-  password: '',
-  passwordConfirmation: '',
-  createdAt: ''
-}
 
 export default {
   name: 'register',
@@ -91,7 +87,14 @@ export default {
       loading: false,
       errors: [],
       valid: false,
-      user: user,
+      success: false,
+      user: {
+        username: '',
+        email: '',
+        password: '',
+        passwordConfirmation: '',
+        createdAt: ''
+      },
       users: []
     }
   },
@@ -105,7 +108,6 @@ export default {
   },
   methods: {
     checkForm: function (e) {
-      console.log(this.user.username);
       if ( this.user.username &&
            this.validUsername(this.user.username) &&
            this.user.email &&
@@ -116,9 +118,9 @@ export default {
            (this.user.password === this.user.passwordConfirmation)) {
         this.valid = true;
       }
-
+      
       this.errors = [];
-
+      
       if (!this.user.username) {
         this.errors.push('Username required.');
       } else if (!this.validUsername(this.user.username)) {
@@ -140,7 +142,7 @@ export default {
       if (this.user.password !== this.user.passwordConfirmation) {
         this.errors.push('Password and Confirmation does not match.');
       }
-
+      
       e.preventDefault();
     },
     validPassword: function (password) {
@@ -156,27 +158,49 @@ export default {
       return re.test(email);
     },
     resetModel: function() {
-      this.user = user;
+      this.user = {
+        username: '',
+        email: '',
+        password: '',
+        passwordConfirmation: '',
+        createdAt: ''
+      };
     },
     loadUsers: function () {
       let component = this;
       UserService.list().on('value', function(snapshot) {
         let usersArray = []
         snapshot.forEach(function(childSnapshot) {
-          var childKey = childSnapshot.key;
-          var childData = childSnapshot.val();
-          usersArray.push(childData);
+          var userData = childSnapshot.val();
+          userData["id"] = childSnapshot.key;
+          usersArray.push(userData);
         });
-
+        
         component.users = usersArray;
         component.loading = false;
-    });
+      });
     },
     saveUser: function (e) {
       if (!this.valid) return;
       let component = this;
       component.loading = true;
-      UserService.save(this.user).save().then(
+      UserService.save(this.user).then(
+        function () {
+          component.loading = false;
+          component.resetModel();
+          component.success = true;
+        },
+        function () {
+          component.loading = false;
+          component.errors.push('An error occured while trying to save into the database.');
+        }
+      );
+      e.preventDefault();
+    },
+    removeUser: function (userId) {
+      let component = this;
+      component.loading = true;
+      UserService.remove(userId).then(
         function () {
           component.loading = false;
         },
@@ -185,7 +209,6 @@ export default {
           component.errors.push('An error occured while trying to save into the database.');
         }
       );
-      e.preventDefault();
     }
   }
 }

@@ -11,4 +11,8 @@ export default class UserService {
     user["createdAt"] = new Date().toISOString();
     return firebase.database().ref('users/' + userId).set(user);
   }
+
+  static remove(userId) {
+    return firebase.database().ref('users/' + userId).remove();
+  }
 }

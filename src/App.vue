@@ -88,6 +88,9 @@ form label {
 .error-message {
   color: #df0000;
 }
+.success-message {
+  color: #009900;
+}
 footer {
   text-align: center;
 }
