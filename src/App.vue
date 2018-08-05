@@ -35,4 +35,16 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+.flex-grid {
+  display: flex;
+}
+.col {
+  flex: 1;
+}
+.panel {
+  border: 1px solid #eee;
+}
+table {
+  width: 100%:
+}
 </style>
