@@ -93,6 +93,14 @@ export default {
       users: []
     }
   },
+  computed: {
+    usersEmpty: function () {
+      return this.users.length == 0;
+    }
+  },
+  created: function () {
+    this.loadUsers();
+  },
   methods: {
     checkForm: function (e) {
       console.log(this.user.username);
@@ -148,24 +156,34 @@ export default {
     resetModel: function() {
       this.user = user;
     },
+    loadUsers: function () {
+      let component = this;
+      UserService.list().on('value', function(snapshot) {
+        let usersArray = []
+        snapshot.forEach(function(childSnapshot) {
+          var childKey = childSnapshot.key;
+          var childData = childSnapshot.val();
+          usersArray.push(childData);
+        });
+
+        component.users = usersArray;
+        component.loading = false;
+    });
+    },
     saveUser: function (e) {
       if (!this.valid) return;
-      this.loading = true;
-      let newUser = new UserService(this.user)
       let component = this;
-      newUser.save().then(
-        function (done) {
+      component.loading = true;
+      UserService.save(this.user).save().then(
+        function () {
           component.loading = false;
         },
-        function (error) {
+        function () {
           component.loading = false;
           component.errors.push('An error occured while trying to save into the database.');
         }
       );
       e.preventDefault();
-    },
-    usersEmpty: function () {
-      return this.users.length == 0;
     }
   }
 }
