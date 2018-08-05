@@ -45,6 +45,6 @@ export default {
   border: 1px solid #eee;
 }
 table {
-  width: 100%:
+  width: 100%;
 }
 </style>
